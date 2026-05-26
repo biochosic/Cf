@@ -205,7 +205,6 @@
 </head>
 <body>
 
-    <!-- Вибір шрифту на головному екрані -->
     <div class="font-selector-top">
         <label for="globalFont">Шрифт: </label>
         <select id="globalFont" onchange="changeFont(this.value)">
@@ -216,23 +215,19 @@
         </select>
     </div>
 
-    <!-- Екран з задачами -->
     <div class="game-container" id="gameBox">
         <h1>Геометрія 8 клас</h1>
         <div class="task-box" id="taskText">Завантаження задачі...</div>
         <div class="options-grid" id="optionsBox">
-            <!-- Кнопки відповідей -->
-        </div>
+            </div>
     </div>
 
-    <!-- Екран для малювання -->
     <div class="paint-overlay" id="paintOverlay">
         <div class="timer-container">Час: <span id="timer">30</span>с</div>
-        <div class="paint-header">Правильно! Прогрес збережено, малюй далі! 🎨</div>
+        <div class="paint-header">Правильно! Твій малюнок надійно збережено, малюй далі! 🎨</div>
         
         <canvas id="paintCanvas"></canvas>
         
-        <!-- Інструменти олівця -->
         <div class="paint-tools">
             <label>
                 Колір:
@@ -254,53 +249,32 @@
     </div>
 
     <script>
-        // Розширена база задач (додано легкі питання)
+        // ВЕЛИКИЙ ЗАПАС ЗАДАЧ (20 питань різної складності за 8 клас)
         const tasks = [
-            {
-                question: "Скільки сторін має чотирикутник?",
-                answers: ["3 сторінки", "4 сторони", "5 сторін", "6 сторін"],
-                correct: "4 сторони"
-            },
-            {
-                question: "Як називається паралелограм, у якого всі кути прямі?",
-                answers: ["Ромб", "Квадрат", "Прямокутник", "Трапеція"],
-                correct: "Прямокутник"
-            },
-            {
-                question: "Яка сума гострих кутів прямокутного трикутника?",
-                answers: ["45°", "90°", "180°", "60°"],
-                correct: "90°"
-            },
-            {
-                question: "Знайдіть площу прямокутника зі сторонами 6 см і 8 см.",
-                answers: ["14 см²", "48 см²", "28 см²", "24 см²"],
-                correct: "48 см²"
-            },
-            {
-                question: "Периметр квадрата 20 см. Яка довжина його однієї сторони?",
-                answers: ["4 см", "5 см", "10 см", "20 см"],
-                correct: "5 см"
-            },
-            {
-                question: "Знайдіть суму кутів опуклого чотирикутника.",
-                answers: ["180°", "360°", "540°", "90°"],
-                correct: "360°"
-            },
-            {
-                question: "У прямокутному трикутнику катети дорівнюють 3 см і 4 см. Знайдіть гіпотенузу.",
-                answers: ["5 см", "7 см", "25 см", "6 см"],
-                correct: "5 см"
-            },
-            {
-                question: "Як називається чотирикутник, у якого тільки дві сторони паралельні?",
-                answers: ["Ромб", "Паралелограм", "Трапеція", "Прямокутник"],
-                correct: "Трапеція"
-            }
+            { question: "Скільки сторін має чотирикутник?", answers: ["3 сторінки", "4 сторони", "5 сторін", "6 сторін"], correct: "4 сторони" },
+            { question: "Як називається паралелограм, у якого всі кути прямі?", answers: ["Ромб", "Квадрат", "Прямокутник", "Трапеція"], correct: "Прямокутник" },
+            { question: "Яка сума гострих кутів прямокутного трикутника?", answers: ["45°", "90°", "180°", "60°"], correct: "90°" },
+            { question: "Знайдіть площу прямокутника зі сторонами 6 см і 8 см.", answers: ["14 см²", "48 см²", "28 см²", "24 см²"], correct: "48 см²" },
+            { question: "Периметр квадрата 20 см. Яка довжина його однієї сторони?", answers: ["4 см", "5 см", "10 см", "20 см"], correct: "5 см" },
+            { question: "Знайдіть суму кутів опуклого чотирикутника.", answers: ["180°", "360°", "540°", "90°"], correct: "360°" },
+            { question: "У прямокутному трикутнику катети дорівнюють 3 см і 4 см. Знайдіть гіпотенузу.", answers: ["5 см", "7 см", "25 см", "6 см"], correct: "5 см" },
+            { question: "Як називається чотирикутник, у якого тільки дві сторони паралельні?", answers: ["Ромб", "Паралелограм", "Трапеція", "Прямокутник"], correct: "Трапеція" },
+            { question: "Як називається паралелограм, у якого всі сторони рівні?", answers: ["Трапеція", "Ромб", "Прямокутник", "Дельтоїд"], correct: "Ромб" },
+            { question: "Чому дорівнює середня лінія трикутника, якщо паралельна їй основа рівна 12 см?", answers: ["6 см", "24 см", "12 см", "9 см"], correct: "6 см" },
+            { question: "Якщо один з кутів паралелограма дорівнює 40°, то чому дорівнює сусідній кут?", answers: ["40°", "140°", "50°", "90°"], correct: "140°" },
+            { question: "Діагоналі якої фігури завжди перпендикулярні та ділять його кути навпіл?", answers: ["Прямокутник", "Трапеція", "Ромб", "Довільний чотирикутник"], correct: "Ромб" },
+            { question: "За якою формулою обчислюється площа квадрата зі стороною 'а'?", answers: ["S = 2a", "S = a²", "S = 4a", "S = a³"], correct: "S = a²" },
+            { question: "Як називається сторона прямокутного трикутника, яка лежить навпроти прямого кута?", answers: ["Катет", "Гіпотенуза", "Основа", "Бічна сторона"], correct: "Гіпотенуза" },
+            { question: "Чому дорівнює середня лінія трапеції, якщо її основи 4 см і 8 см?", answers: ["12 см", "4 см", "6 см", "3 см"], correct: "6 см" },
+            { question: "Чому дорівнює площа прямокутного трикутника з катетами 4 см і 5 см?", answers: ["20 см²", "10 см²", "9 см²", "40 см²"], correct: "10 см²" },
+            { question: "Скільки гострих кутів може бути у прямокутній трапеції?", answers: ["Один", "Два", "Три", "Жодного"], correct: "Один" },
+            { question: "У рівнобічній трапеції кути при основі завжди...", answers: ["Рівні", "Різні", "Прямі", "Сума дорівнює 90°"], correct: "Рівні" },
+            { question: "Якщо діагоналі прямокутника рівні, то що можна сказати про діагоналі квадрата?", answers: ["Вони теж рівні", "Вони різні", "Вони не перетинаються", "Вони паралельні"], correct: "Вони теж рівні" },
+            { question: "Чому дорівнює синус кута 30 градусів у прямокутному трикутнику?", answers: ["1", "0.5 (1/2)", "√3/2", "0"], correct: "0.5 (1/2)" }
         ];
 
         let currentTaskIndex = 0;
 
-        // Елементи DOM
         const taskText = document.getElementById('taskText');
         const optionsBox = document.getElementById('optionsBox');
         const paintOverlay = document.getElementById('paintOverlay');
@@ -311,31 +285,46 @@
         const lineColorInput = document.getElementById('lineColor');
         const lineWidthInput = document.getElementById('lineWidth');
 
-        // Віртуальний буфер для збереження малюнка в пам'яті
-        let canvasBuffer = null;
-
+        // Розумна функція зміни розміру полотна без втрати графіки
         function resizeCanvas() {
-            // Перед зміною розміру зберігаємо поточний малюнок
-            const tempSnapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            
+            // Тимчасово зберігаємо малюнок перед ресайзом
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(canvas, 0, 0);
+
+            // Надаємо нові розміри
             canvas.width = window.innerWidth * 0.9;
             canvas.height = window.innerHeight * 0.6;
-            
-            // Повертаємо малюнок назад після зміни роздільної здатності
-            ctx.putImageData(tempSnapshot, 0, 0);
+
+            // Заливаємо білим тлом (про всяк випадок) і повертаємо малюнок
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(tempCanvas, 0, 0);
         }
         
         window.addEventListener('resize', resizeCanvas);
-        // Початкове налаштування розмірів
+
+        // Налаштування початкових розмірів полотна
         canvas.width = window.innerWidth * 0.9;
         canvas.height = window.innerHeight * 0.6;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Функція зміни шрифту
+        // Завантажуємо малюнок з localStorage, якщо учень вже малював раніше
+        if (localStorage.getItem('savedDrawing')) {
+            const img = new Image();
+            img.src = localStorage.getItem('savedDrawing');
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+            }
+        }
+
         function changeFont(fontFamily) {
             document.documentElement.style.setProperty('--current-font', fontFamily);
         }
 
-        // Відображення задачі
         function loadTask() {
             const currentTask = tasks[currentTaskIndex];
             taskText.innerText = currentTask.question;
@@ -351,7 +340,6 @@
             });
         }
 
-        // Перевірка відповіді
         function checkAnswer(selected) {
             const currentTask = tasks[currentTaskIndex];
             if (selected === currentTask.correct) {
@@ -361,16 +349,10 @@
             }
         }
 
-        // Режим малювання з лімітом 30 секунд
         function startPaintMode() {
             paintOverlay.classList.add('active');
             
-            // Відновлюємо попередній малюнок, якщо він був збережений у буфері
-            if (canvasBuffer) {
-                ctx.putImageData(canvasBuffer, 0, 0);
-            }
-            
-            let timeLeft = 30; // Збільшено до 30 секунд за проханням
+            let timeLeft = 30;
             timerElement.innerText = timeLeft;
 
             const countdown = setInterval(() => {
@@ -380,18 +362,17 @@
                 if (timeLeft <= 0) {
                     clearInterval(countdown);
                     
-                    // Зберігаємо поточний стан полотна в пам'ять перед виходом
-                    canvasBuffer = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    // ЗБЕРЕЖЕННЯ ПРОГРЕСУ В ЛОКАЛЬНУ ПАМ'ЯТЬ БРАУЗЕРА
+                    localStorage.setItem('savedDrawing', canvas.toDataURL());
                     
                     paintOverlay.classList.remove('active');
-                    // Перехід до наступного прикладу
                     currentTaskIndex = (currentTaskIndex + 1) % tasks.length;
                     loadTask();
                 }
             }, 1000);
         }
 
-        // --- КЕРУВАННЯ МАЛЮВАННЯМ ---
+        // --- ЛОГІКА МАЛЮВАННЯ (З автозбереженням штрихів) ---
         let painting = false;
 
         function startPosition(e) {
@@ -402,6 +383,8 @@
         function endPosition() {
             painting = false;
             ctx.beginPath();
+            // Зберігаємо стан після кожного відпускання олівця/пальця
+            localStorage.setItem('savedDrawing', canvas.toDataURL());
         }
 
         function draw(e) {
@@ -411,10 +394,10 @@
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             
-            // Використання динамічних налаштувань користувача
             ctx.lineWidth = lineWidthInput.value;
             ctx.strokeStyle = lineColorInput.value;
             ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
 
             ctx.lineTo(clientX - rect.left, clientY - rect.top);
             ctx.stroke();
@@ -423,8 +406,11 @@
         }
 
         function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            canvasBuffer = null; // Очищення буфера пам'яті
+            if(confirm("Ти впевнений, що хочеш повністю стерти малюнок?")) {
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                localStorage.removeItem('savedDrawing'); // Видаляємо з пам'яті браузера
+            }
         }
 
         // Події миші
@@ -432,14 +418,13 @@
         canvas.addEventListener('mouseup', endPosition);
         canvas.addEventListener('mousemove', draw);
 
-        // Події сенсорного екрана
+        // Події тачскріна
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startPosition(e); });
         canvas.addEventListener('touchend', endPosition);
         canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
 
         clearBtn.addEventListener('click', clearCanvas);
 
-        // Старт програми
         loadTask();
     </script>
 </body>
