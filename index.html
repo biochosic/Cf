@@ -11,23 +11,46 @@
             --accent-color: #6366f1;
             --success-color: #10b981;
             --text-color: #f8fafc;
+            --current-font: 'Segoe UI', sans-serif;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: var(--current-font);
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
+        }
+
+        /* Налаштування шрифту для всього сайту */
+        .font-selector-top {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            color: white;
+            z-index: 10;
+        }
+        .font-selector-top select {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 5px;
+            border-radius: 4px;
+            cursor: pointer;
         }
 
         /* Ігровий контейнер */
@@ -103,23 +126,24 @@
         /* Таймер */
         .timer-container {
             position: absolute;
-            top: 20px;
-            font-size: 1.5rem;
+            top: 15px;
+            left: 15px;
+            font-size: 1.3rem;
             font-weight: bold;
             color: #ef4444;
             background: rgba(239, 68, 68, 0.1);
-            padding: 0.5rem 1.5rem;
+            padding: 0.5rem 1.2rem;
             border-radius: 50px;
             border: 2px solid #ef4444;
         }
 
         .paint-header {
             color: #1e293b;
-            margin-bottom: 10px;
-            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
             font-weight: bold;
             text-align: center;
-            padding: 0 10px;
+            margin-top: 40px;
         }
 
         /* Полотно */
@@ -131,14 +155,48 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
-        .paint-controls {
+        /* Панель інструментів малювання */
+        .paint-tools {
+            display: flex;
+            align-items: center;
+            gap: 15px;
             margin-top: 15px;
+            background: #f1f5f9;
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .paint-tools label {
+            color: #334155;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .paint-tools input[type="color"] {
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            background: none;
+        }
+
+        .paint-tools select {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #cbd5e1;
         }
 
         .clear-btn {
             background: #ef4444;
             color: white;
-            padding: 0.6rem 1.5rem;
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
         }
         .clear-btn:hover {
             background: #dc2626;
@@ -147,29 +205,81 @@
 </head>
 <body>
 
+    <!-- Вибір шрифту на головному екрані -->
+    <div class="font-selector-top">
+        <label for="globalFont">Шрифт: </label>
+        <select id="globalFont" onchange="changeFont(this.value)">
+            <option value="'Segoe UI', sans-serif">Стандартний</option>
+            <option value="'Courier New', monospace">Комп'ютерний (Monospace)</option>
+            <option value="'Georgia', serif">Шкільний (Serif)</option>
+            <option value="'Arial', sans-serif">Модерн (Arial)</option>
+        </select>
+    </div>
+
+    <!-- Екран з задачами -->
     <div class="game-container" id="gameBox">
         <h1>Геометрія 8 клас</h1>
         <div class="task-box" id="taskText">Завантаження задачі...</div>
         <div class="options-grid" id="optionsBox">
-            </div>
+            <!-- Кнопки відповідей -->
+        </div>
     </div>
 
+    <!-- Екран для малювання -->
     <div class="paint-overlay" id="paintOverlay">
-        <div class="timer-container">Залишилось: <span id="timer">20</span>с</div>
-        <div class="paint-header">Правильно! Бонус: малюй будь-що 20 секунд! 🎨</div>
+        <div class="timer-container">Час: <span id="timer">30</span>с</div>
+        <div class="paint-header">Правильно! Прогрес збережено, малюй далі! 🎨</div>
+        
         <canvas id="paintCanvas"></canvas>
-        <div class="paint-controls">
-            <button class="clear-btn" id="clearBtn">Очистити</button>
+        
+        <!-- Інструменти олівця -->
+        <div class="paint-tools">
+            <label>
+                Колір:
+                <input type="color" id="lineColor" value="#1e293b">
+            </label>
+            
+            <label>
+                Товщина:
+                <select id="lineWidth">
+                    <option value="2">Тонкий</option>
+                    <option value="5" selected>Середній</option>
+                    <option value="10">Товстий</option>
+                    <option value="20">Маркер</option>
+                </select>
+            </label>
+
+            <button class="clear-btn" id="clearBtn">Очистити все</button>
         </div>
     </div>
 
     <script>
-        // База задач з геометрії за 8 клас
+        // Розширена база задач (додано легкі питання)
         const tasks = [
+            {
+                question: "Скільки сторін має чотирикутник?",
+                answers: ["3 сторінки", "4 сторони", "5 сторін", "6 сторін"],
+                correct: "4 сторони"
+            },
+            {
+                question: "Як називається паралелограм, у якого всі кути прямі?",
+                answers: ["Ромб", "Квадрат", "Прямокутник", "Трапеція"],
+                correct: "Прямокутник"
+            },
+            {
+                question: "Яка сума гострих кутів прямокутного трикутника?",
+                answers: ["45°", "90°", "180°", "60°"],
+                correct: "90°"
+            },
             {
                 question: "Знайдіть площу прямокутника зі сторонами 6 см і 8 см.",
                 answers: ["14 см²", "48 см²", "28 см²", "24 см²"],
                 correct: "48 см²"
+            },
+            {
+                question: "Периметр квадрата 20 см. Яка довжина його однієї сторони?",
+                answers: ["4 см", "5 см", "10 см", "20 см"],
+                correct: "5 см"
             },
             {
                 question: "Знайдіть суму кутів опуклого чотирикутника.",
@@ -177,14 +287,14 @@
                 correct: "360°"
             },
             {
-                question: "У прямокутному трикутнику катети дорівнюють 3 см і 4 см. Знайдіть гіпотенузу (Т. Піфагора).",
+                question: "У прямокутному трикутнику катети дорівнюють 3 см і 4 см. Знайдіть гіпотенузу.",
                 answers: ["5 см", "7 см", "25 см", "6 см"],
                 correct: "5 см"
             },
             {
-                question: "Чому дорівнює площа паралелограма, основа якого 10 см, а висота — 5 см?",
-                answers: ["25 см²", "15 см²", "50 см²", "30 см²"],
-                correct: "50 см²"
+                question: "Як називається чотирикутник, у якого тільки дві сторони паралельні?",
+                answers: ["Ромб", "Паралелограм", "Трапеція", "Прямокутник"],
+                correct: "Трапеція"
             }
         ];
 
@@ -198,14 +308,32 @@
         const canvas = document.getElementById('paintCanvas');
         const ctx = canvas.getContext('2d');
         const clearBtn = document.getElementById('clearBtn');
+        const lineColorInput = document.getElementById('lineColor');
+        const lineWidthInput = document.getElementById('lineWidth');
 
-        // Налаштування Canvas під екран
+        // Віртуальний буфер для збереження малюнка в пам'яті
+        let canvasBuffer = null;
+
         function resizeCanvas() {
-            canvas.width = window.innerWidth * 0.85;
+            // Перед зміною розміру зберігаємо поточний малюнок
+            const tempSnapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            
+            canvas.width = window.innerWidth * 0.9;
             canvas.height = window.innerHeight * 0.6;
+            
+            // Повертаємо малюнок назад після зміни роздільної здатності
+            ctx.putImageData(tempSnapshot, 0, 0);
         }
+        
         window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        // Початкове налаштування розмірів
+        canvas.width = window.innerWidth * 0.9;
+        canvas.height = window.innerHeight * 0.6;
+
+        // Функція зміни шрифту
+        function changeFont(fontFamily) {
+            document.documentElement.style.setProperty('--current-font', fontFamily);
+        }
 
         // Відображення задачі
         function loadTask() {
@@ -213,7 +341,6 @@
             taskText.innerText = currentTask.question;
             optionsBox.innerHTML = '';
 
-            // Перемішуємо варіанти відповідей
             const shuffledAnswers = [...currentTask.answers].sort(() => Math.random() - 0.5);
 
             shuffledAnswers.forEach(answer => {
@@ -234,12 +361,16 @@
             }
         }
 
-        // Режим малювання з обмеженням часу
+        // Режим малювання з лімітом 30 секунд
         function startPaintMode() {
             paintOverlay.classList.add('active');
-            clearCanvas();
             
-            let timeLeft = 20;
+            // Відновлюємо попередній малюнок, якщо він був збережений у буфері
+            if (canvasBuffer) {
+                ctx.putImageData(canvasBuffer, 0, 0);
+            }
+            
+            let timeLeft = 30; // Збільшено до 30 секунд за проханням
             timerElement.innerText = timeLeft;
 
             const countdown = setInterval(() => {
@@ -248,15 +379,19 @@
 
                 if (timeLeft <= 0) {
                     clearInterval(countdown);
+                    
+                    // Зберігаємо поточний стан полотна в пам'ять перед виходом
+                    canvasBuffer = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    
                     paintOverlay.classList.remove('active');
-                    // Перехід до наступної задачі
+                    // Перехід до наступного прикладу
                     currentTaskIndex = (currentTaskIndex + 1) % tasks.length;
                     loadTask();
                 }
             }, 1000);
         }
 
-        // --- ЛОГІКА МАЛЮВАННЯ (Звичайне + Тачскрін) ---
+        // --- КЕРУВАННЯ МАЛЮВАННЯМ ---
         let painting = false;
 
         function startPosition(e) {
@@ -272,14 +407,14 @@
         function draw(e) {
             if (!painting) return;
             
-            // Отримуємо координати залежно від типу пристрою (мишка чи палець)
             const rect = canvas.getBoundingClientRect();
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             
-            ctx.lineWidth = 4;
+            // Використання динамічних налаштувань користувача
+            ctx.lineWidth = lineWidthInput.value;
+            ctx.strokeStyle = lineColorInput.value;
             ctx.lineCap = 'round';
-            ctx.strokeStyle = '#1e293b'; // Темний колір для малювання на білому тлі
 
             ctx.lineTo(clientX - rect.left, clientY - rect.top);
             ctx.stroke();
@@ -289,22 +424,23 @@
 
         function clearCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvasBuffer = null; // Очищення буфера пам'яті
         }
 
-        // Слухачі подій для малювання
+        // Події миші
         canvas.addEventListener('mousedown', startPosition);
         canvas.addEventListener('mouseup', endPosition);
         canvas.addEventListener('mousemove', draw);
 
+        // Події сенсорного екрана
         canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startPosition(e); });
         canvas.addEventListener('touchend', endPosition);
         canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
 
         clearBtn.addEventListener('click', clearCanvas);
 
-        // Старт гри
+        // Старт програми
         loadTask();
     </script>
 </body>
 </html>
-
